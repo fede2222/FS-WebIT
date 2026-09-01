@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Backend Interview Cockpit</title>
+<style>
+:root{--bg:#0b1020;--panel:#151d33;--panel2:#10172a;--text:#f6f8fb;--muted:#aebbd0;--accent:#7bb3ff;--border:#263557;--good:#b9f6ca;--warn:#ffe082}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,Arial,sans-serif;background:var(--bg);color:var(--text)}
+header{position:sticky;top:0;z-index:5;background:rgba(11,16,32,.98);border-bottom:1px solid var(--border);padding:12px 16px}
+.top{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.title{font-weight:700;margin-right:8px}.nav button,.chip{background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:10px;padding:9px 12px;cursor:pointer;font-size:14px}.nav button.active,.chip.active{border-color:var(--accent);color:var(--accent)}
+main{padding:16px;max-width:1500px;margin:auto}.section{display:none}.section.active{display:block}.chips{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}.card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:14px;min-height:150px}.card h3{margin:0 0 8px;font-size:16px}.cue{font-size:15px;font-weight:700;color:var(--accent);margin-bottom:8px}.card p,.card li{font-size:13px;line-height:1.45;color:var(--muted)}.card ul{padding-left:18px;margin:7px 0}.say{margin-top:10px;padding:9px;border-left:3px solid var(--accent);background:var(--panel2);font-size:13px;line-height:1.4}.tag{font-size:11px;color:var(--good);margin-top:8px}.hidden{display:none!important}
+@media(max-width:700px){.title{width:100%}.nav button{padding:8px 9px}.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+  <div class="top">
+    <div class="title">Backend Interview Cockpit</div>
+    <div class="nav" id="nav">
+      <button data-section="csharp" class="active">C# / .NET</button>
+      <button data-section="api">API</button>
+      <button data-section="sql">SQL</button>
+      <button data-section="arch">Architecture</button>
+      <button data-section="dist">Distributed</button>
+      <button data-section="cloud">Cloud</button>
+      <button data-section="devops">DevOps</button>
+      <button data-section="design">System Design</button>
+    </div>
+  </div>
+</header>
+<main>
+<section id="csharp" class="section active">
+<div class="chips"><button class="chip active" data-filter="all">All</button><button class="chip" data-filter="async">Async</button><button class="chip" data-filter="memory">Memory</button><button class="chip" data-filter="linq">LINQ</button><button class="chip" data-filter="types">Types</button></div>
+<div class="grid">
+<div class="card" data-topic="types"><h3>Record vs Class</h3><div class="cue">Record = value-based equality · Class = reference identity by default</div><p>Records are useful for immutable/data-oriented models and support <code>with</code> expressions.</p><div class="say">“The main difference is the default equality semantics. Classes use reference equality by default, while records use value-based equality.”</div></div>
+<div class="card" data-topic="types"><h3>ref / out / in</h3><div class="cue">ref = read/write · out = must assign · in = readonly reference</div><ul><li><b>ref</b>: caller initializes, callee can modify.</li><li><b>out</b>: caller need not initialize, callee must assign.</li><li><b>in</b>: readonly reference, useful for large structs.</li></ul></div>
+<div class="card" data-topic="async"><h3>Task vs Thread</h3><div class="cue">Task ≠ Thread</div><p>Thread is an execution unit. Task is a higher-level abstraction representing work that may complete later and does not require a dedicated thread.</p><div class="say">“A Task represents an operation that may complete in the future and doesn't necessarily have a dedicated thread.”</div></div>
+<div class="card" data-topic="async"><h3>ThreadPool</h3><div class="cue">Reusable threads managed by .NET</div><p>Creating threads is expensive. With async I/O, a thread does not remain blocked while waiting and can serve other work.</p></div>
+<div class="card" data-topic="async"><h3>CancellationToken</h3><div class="cue">Cooperative cancellation</div><p>Source requests cancellation; token communicates it. Propagate request tokens through controller → service → repository → I/O.</p></div>
+<div class="card" data-topic="async"><h3>Task.WhenAll</h3><div class="cue">Start independent tasks → await all concurrently</div><p>Do not confuse tasks with threads. Same EF Core DbContext should not run concurrent operations.</p></div>
+<div class="card" data-topic="linq"><h3>IEnumerable vs IQueryable</h3><div class="cue">IEnumerable = .NET enumeration · IQueryable = translatable query</div><p>With EF, build filters before materialization so the provider can translate them to SQL.</p></div>
+<div class="card" data-topic="linq"><h3>ToList too early</h3><div class="cue">Materialize after filtering</div><p><code>db.Players.ToList().Where(...)</code> may load the full table. Prefer <code>db.Players.Where(...).ToList()</code>.</p></div>
+<div class="card" data-topic="linq"><h3>First vs Single</h3><div class="cue">First = give me first · Single = there must be at most/exactly one</div><p>OrDefault changes the zero-result behavior. Single/SingleOrDefault throw if multiple rows match.</p></div>
+<div class="card" data-topic="memory"><h3>Stack vs Heap</h3><div class="cue">Stack frames for calls · managed heap for objects</div><p>Value types are not always on the stack. A value-type field inside a heap object lives with that object.</p></div>
+<div class="card" data-topic="memory"><h3>Boxing</h3><div class="cue">Value type → managed object allocation</div><p>Boxing can allocate on the managed heap and increase GC pressure.</p></div>
+</div></section>
+
+<section id="api" class="section"><div class="grid">
+<div class="card"><h3>Dependency Injection</h3><div class="cue">Provide dependencies from outside · reduce coupling · improve testability</div><div class="say">“A class receives its dependencies from the outside instead of constructing them itself.”</div></div>
+<div class="card"><h3>Authentication vs Authorization</h3><div class="cue">Authentication = who are you? · Authorization = what can you do?</div></div>
+<div class="card"><h3>401 vs 403</h3><div class="cue">401 = credentials/identity missing or invalid · 403 = known identity, forbidden</div></div>
+<div class="card"><h3>PUT vs PATCH</h3><div class="cue">PUT = full replacement/update · PATCH = partial update</div><p>PUT is idempotent by HTTP semantics.</p></div>
+<div class="card"><h3>Middleware</h3><div class="cue">HTTP request/response pipeline</div><p>Can inspect/modify request/response, call next, or short-circuit. Order matters: authentication before authorization.</p></div>
+<div class="card"><h3>Idempotency</h3><div class="cue">Same operation N times → same resulting state as once</div><p>Important for retries after timeout/communication failure. Often uses operation/message IDs and unique constraints.</p></div>
+<div class="card"><h3>Exception Handling</h3><div class="cue">Don't swallow exceptions</div><p>Catch when you know how to handle. Preserve stack with <code>throw;</code>, not <code>throw ex;</code>.</p></div>
+</div></section>
+
+<section id="sql" class="section"><div class="grid">
+<div class="card"><h3>SQL slow?</h3><div class="cue">Measure first: execution plan, indexes, scans, joins, sorts, locks, volume</div><div class="say">“I would not optimize blindly. I would inspect the execution plan and identify the actual bottleneck first.”</div></div>
+<div class="card"><h3>Sargability</h3><div class="cue">Predicate allows efficient index use</div><p>Avoid functions/conversions on indexed columns when possible. Example: range predicates on dates instead of <code>YEAR(Date)=...</code>.</p></div>
+<div class="card"><h3>Clustered / Nonclustered</h3><div class="cue">Clustered organizes table rows by key · Nonclustered = separate structure + row locator</div><p>SQL Server concept. One clustered index per table; multiple nonclustered indexes.</p></div>
+<div class="card"><h3>INNER / LEFT JOIN</h3><div class="cue">INNER = matching rows only · LEFT = all left rows + NULLs when no right match</div></div>
+<div class="card"><h3>WHERE / HAVING</h3><div class="cue">WHERE filters rows before grouping · HAVING filters groups after aggregation</div></div>
+<div class="card"><h3>Optimistic Concurrency</h3><div class="cue">No lock while working · detect conflict on write</div><p>Version/timestamp or conditional UPDATE. 0 affected rows can signal conflict.</p></div>
+<div class="card"><h3>Pessimistic Concurrency</h3><div class="cue">Lock resource during operation</div><p>Useful when conflicts are frequent or exclusive access is required.</p></div>
+<div class="card"><h3>Race Condition</h3><div class="cue">Result depends on timing/order of concurrent access to shared state</div><p>Lost update is a classic example.</p></div>
+<div class="card"><h3>Deadlock</h3><div class="cue">A waits for B · B waits for A</div><p>Reduce risk with consistent lock order, short transactions and minimal lock duration.</p></div>
+</div></section>
+
+<section id="arch" class="section"><div class="grid">
+<div class="card"><h3>Horizontal Scaling</h3><div class="cue">Stateless API + multiple instances + load balancer</div><p>Move shared state to DB/Redis/broker. Containers package; orchestrators/platforms scale.</p></div>
+<div class="card"><h3>Monolith vs Microservices</h3><div class="cue">Monolith = simpler operations · Microservices = independent deploy/scale + distributed complexity</div><p>Microservices add timeouts, retries, partial failures, data consistency, messaging and observability concerns.</p></div>
+<div class="card"><h3>Cache-aside</h3><div class="cue">Read cache → miss → DB → populate cache</div><p>On write, invalidate/update cache depending consistency requirements.</p></div>
+<div class="card"><h3>Cache Consistency</h3><div class="cue">Ask: how stale can this data be?</div><p>Use TTL, invalidation, events/outbox, retries depending business requirements.</p></div>
+<div class="card"><h3>Dependency Inversion</h3><div class="cue">Depend on abstractions, not concrete implementations</div><p>DI is a technique that can help implement DIP.</p></div>
+<div class="card"><h3>Testing Strategy</h3><div class="cue">Unit = fast/isolated · Integration = components together · E2E = full flow</div><p>Don't mock everything automatically; mock where isolation adds value.</p></div>
+</div></section>
+
+<section id="dist" class="section"><div class="grid">
+<div class="card"><h3>Message Broker</h3><div class="cue">Infrastructure between producer and consumer</div><p>Receives, stores/routes and delivers messages. Examples: RabbitMQ, Azure Service Bus.</p></div>
+<div class="card"><h3>Queue vs Pub/Sub</h3><div class="cue">Queue = one worker handles item · Pub/Sub = multiple subscribers receive event</div><p>Pub/Sub is a communication pattern; RabbitMQ is a broker that can implement messaging patterns.</p></div>
+<div class="card"><h3>Why async messaging?</h3><div class="cue">No immediate response needed · temporal decoupling · buffering · retries · resilience</div><p>Trade-offs: eventual consistency, duplicates, ordering and observability complexity.</p></div>
+<div class="card"><h3>Transactional Outbox</h3><div class="cue">Business change + outbox row in SAME DB transaction</div><p>A worker later publishes/processes the pending event and retries safely.</p><div class="say">“The outbox makes the intent durable even if the external publish or cache invalidation fails.”</div></div>
+<div class="card"><h3>At-least-once</h3><div class="cue">Don't lose message · duplicates possible → idempotent consumer</div></div>
+<div class="card"><h3>At-most-once</h3><div class="cue">No duplicates · message may be lost</div></div>
+<div class="card"><h3>Eventual Consistency</h3><div class="cue">Temporary divergence → eventual convergence</div><p>Acceptable when business can tolerate staleness/delay.</p></div>
+<div class="card"><h3>Retry / Timeout / Circuit Breaker</h3><div class="cue">Timeout = stop waiting · Retry = try again · Circuit breaker = stop calling failing dependency temporarily</div><p>Circuit: closed → open → half-open → recovered or open again.</p></div>
+</div></section>
+
+<section id="cloud" class="section"><div class="grid">
+<div class="card"><h3>Azure Hosting</h3><div class="cue">VM = control · App Service/Container Apps = managed · AKS = Kubernetes</div></div>
+<div class="card"><h3>Secrets</h3><div class="cue">Use Key Vault / secret manager · never bake secrets into image</div></div>
+<div class="card"><h3>Redis</h3><div class="cue">Hot reads · cache · TTL · invalidation</div><p>Ask consistency requirements before caching.</p></div>
+<div class="card"><h3>Messaging</h3><div class="cue">Azure Service Bus for durable messaging · Event Grid for event distribution scenarios</div></div>
+<div class="card"><h3>Observability</h3><div class="cue">Logs + metrics + traces</div><p>Azure Monitor / Application Insights; OpenTelemetry for vendor-neutral instrumentation.</p></div>
+</div></section>
+
+<section id="devops" class="section"><div class="grid">
+<div class="card"><h3>Docker</h3><div class="cue">Image = immutable package · Container = running instance</div><p>Docker packages and runs; orchestration/platform handles dynamic scaling.</p></div>
+<div class="card"><h3>Kubernetes</h3><div class="cue">Desired state orchestration</div><p>Deployment manages replicas; Service gives stable access; scheduler replaces pods; node scaling is separate from pod scaling.</p></div>
+<div class="card"><h3>Health Checks</h3><div class="cue">Liveness = should restart? · Readiness = can receive traffic? · Startup = has app started?</div></div>
+<div class="card"><h3>Rolling Deployment</h3><div class="cue">Gradual replacement while serving traffic</div><p>Use readiness checks and graceful shutdown/draining.</p></div>
+<div class="card"><h3>Blue/Green / Canary</h3><div class="cue">Blue/Green = switch environments · Canary = small traffic percentage first</div></div>
+<div class="card"><h3>CI/CD</h3><div class="cue">Build → test → package → deploy → verify</div><p>Automate repeatable delivery and keep rollback strategy.</p></div>
+</div></section>
+
+<section id="design" class="section"><div class="grid">
+<div class="card"><h3>System Design Opening</h3><div class="cue">Clarify requirements before choosing architecture</div><ul><li>Traffic / concurrency?</li><li>Read vs write ratio?</li><li>Latency target?</li><li>Consistency requirements?</li><li>Failure tolerance?</li></ul></div>
+<div class="card"><h3>Typical Scalable Backend</h3><div class="cue">LB → stateless APIs → DB + Redis + broker</div><p>Add replicas, partitions or async work only when measurements justify them.</p></div>
+<div class="card"><h3>Database Bottleneck</h3><div class="cue">Queries/indexes first → caching/read replicas → partition/shard only if needed</div></div>
+<div class="card"><h3>Hot Key / Cache Stampede</h3><div class="cue">Single-flight / per-key lock · stale-while-revalidate · TTL jitter for many-key expiry</div></div>
+<div class="card"><h3>Read Replicas</h3><div class="cue">Scale reads · beware replication lag</div><p>Consider read-your-writes requirements.</p></div>
+<div class="card"><h3>Purchase Flow</h3><div class="cue">DB transaction for critical state + outbox for async side effects</div><p>Use idempotency for retries/duplicate messages.</p></div>
+<div class="card"><h3>Realtime / Gaming</h3><div class="cue">Authoritative server · latency-aware design · persist only what must be durable</div><p>Keep hot match state in memory, use durable events/checkpoints as appropriate.</p></div>
+</div></section>
+</main>
+<script>
+const navButtons=[...document.querySelectorAll('#nav button')];
+const sections=[...document.querySelectorAll('.section')];
+navButtons.forEach(btn=>btn.addEventListener('click',()=>{
+  navButtons.forEach(b=>b.classList.remove('active'));btn.classList.add('active');
+  sections.forEach(s=>s.classList.toggle('active',s.id===btn.dataset.section));
+}));
+document.querySelectorAll('.chips').forEach(group=>{
+  const chips=[...group.querySelectorAll('.chip')];
+  const section=group.closest('.section');
+  chips.forEach(chip=>chip.addEventListener('click',()=>{
+    chips.forEach(c=>c.classList.remove('active'));chip.classList.add('active');
+    const f=chip.dataset.filter;
+    section.querySelectorAll('.card').forEach(card=>card.classList.toggle('hidden',f!=='all'&&card.dataset.topic!==f));
+  }));
+});
+</script>
+</body>
+</html>
