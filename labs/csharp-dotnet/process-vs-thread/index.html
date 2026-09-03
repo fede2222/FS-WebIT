@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#09111c">
+<title>Process vs Thread · Backend Engineering Labs</title>
+<style>
+:root{--bg:#09111c;--panel:#101b2a;--line:#263c55;--text:#eef6ff;--muted:#94a9bd;--blue:#6aa7ff;--cyan:#53d8e8;--green:#78e3a6;--red:#ff8b8b;--shadow:0 18px 52px #0007}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 90% 0,#17314d 0,transparent 28%),var(--bg);color:var(--text);font:15px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}.shell{width:min(900px,calc(100% - 30px));margin:auto}.topbar{display:flex;justify-content:space-between;align-items:center;padding:20px 0;color:var(--muted);font-size:.86rem}.topbar a{color:inherit;text-decoration:none}.crumbs{display:flex;gap:8px;align-items:center}.crumbs span{opacity:.5}header{padding:52px 0 28px}.eyebrow{color:var(--cyan);font-size:.76rem;font-weight:800;letter-spacing:.15em;text-transform:uppercase}h1{font-size:clamp(2.8rem,7vw,5.4rem);line-height:.96;letter-spacing:-.055em;margin:14px 0 16px}.lede{max-width:760px;color:#bfd0df;font-size:1.08rem;margin:0}.concept{border-left:3px solid var(--cyan);padding:4px 0 4px 18px;margin:25px 0 30px;color:#dbe7f1}.actions{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:24px}.button{appearance:none;border:1px solid #3a5d7d;background:#10233a;color:var(--text);padding:10px 15px;border-radius:10px;text-decoration:none;font:inherit;font-weight:750;cursor:pointer}.button:hover{border-color:var(--cyan)}.button.primary{background:linear-gradient(100deg,#315fbd,#178a9a);border-color:#5da6e8}.terminal-wrap{display:none;margin:6px 0 48px;border:1px solid #31485e;border-radius:15px;overflow:hidden;box-shadow:var(--shadow);background:#060b10}.terminal-wrap.open{display:block}.terminal-bar{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:#101820;border-bottom:1px solid #283746;color:#8fa5b8;font-size:.75rem}.lights{display:flex;gap:6px}.lights i{width:9px;height:9px;border-radius:50%;background:#526274}.terminal{min-height:210px;padding:18px;color:#d4e5d4;font:14px/1.65 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:pre-wrap}.prompt{color:#72ddad}.info{color:#8fb3cf}.warning{color:#ffc86b}.result{border:1px solid var(--line);border-radius:15px;background:linear-gradient(145deg,#101f31,#0b1725);padding:18px;margin:10px 0 44px}.result small{display:block;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-size:.68rem;margin-bottom:8px}.result pre{margin:0;color:#d5e5ef;font:14px/1.6 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:pre-wrap}.foot{border-top:1px solid var(--line);padding:24px 0 45px;color:var(--muted);font-size:.8rem}@media(max-width:620px){header{padding-top:34px}.topbar>a:last-child{display:none}}
+</style>
+</head>
+<body><div class="shell">
+<nav class="topbar"><div class="crumbs"><a href="../../../">Federico Sevil</a><span>/</span><a href="../../">Labs</a></div><a href="../../../backend-roadmap/">Backend Roadmap</a></nav>
+<header><div class="eyebrow">C# / .NET · Backend Engineering Lab</div><h1>Process vs Thread</h1><p class="lede">Experimento mínimo para visualizar que un proceso puede contener múltiples threads de ejecución.</p></header>
+<div class="concept"><strong>Concepto a fijar:</strong> el proceso es la instancia del programa con sus recursos y memoria; dentro de ese proceso pueden existir varios threads que comparten esos recursos y ejecutan trabajo de forma independiente. En este lab se imprime el Process ID y los IDs administrados por .NET de tres threads creados explícitamente.</div>
+<div class="actions"><button class="button primary" id="run">▶ Run lab</button><a class="button" href="https://github.com/fede2222/backend-engineering-labs/blob/main/labs/csharp-dotnet/process-vs-thread/Program.cs" target="_blank" rel="noopener">GitHub ↗</a></div>
+<div class="terminal-wrap" id="terminalWrap"><div class="terminal-bar"><div class="lights"><i></i><i></i><i></i></div><span>process-vs-thread · dotnet</span></div><div class="terminal" id="terminal"></div></div>
+<div class="result"><small>Example output</small><pre>Backend Engineering Labs
+Process ID 116148
+Thread --&gt; 4
+Thread --&gt; 6
+Thread --&gt; 5</pre></div>
+<div class="foot">Lab source: C# / .NET · process-vs-thread</div>
+</div>
+<script>
+const RUN_ENDPOINT='';
+const wrap=document.getElementById('terminalWrap');
+const terminal=document.getElementById('terminal');
+const run=document.getElementById('run');
+function write(text,cls=''){const s=document.createElement('span');if(cls)s.className=cls;s.textContent=text;terminal.appendChild(s)}
+run.addEventListener('click',async()=>{
+  wrap.classList.add('open');terminal.innerHTML='';run.disabled=true;
+  write('$ ','prompt');write('dotnet run\n');
+  if(!RUN_ENDPOINT){write('\n[runner] ','info');write('Live execution backend not connected yet.\n','warning');write('[runner] The page is ready to stream stdout here when the Labs Runtime endpoint is enabled.\n','info');run.disabled=false;return;}
+  try{const r=await fetch(RUN_ENDPOINT,{method:'POST'});if(!r.ok)throw new Error('HTTP '+r.status);const data=await r.text();write(data+'\n')}catch(e){write('\n[runner] '+e.message+'\n','warning')}finally{run.disabled=false}
+});
+</script>
+</body></html>
